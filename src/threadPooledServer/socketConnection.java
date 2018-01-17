@@ -9,12 +9,12 @@ import java.net.Socket;
  * Created by Lenovo T420 on 17-1-2018.
  * socket, bufferedReader pairi
  */
-public class socketConnection{
-    int portNumber;
-    Socket clientSocket = null;
+class socketConnection{
+    private int portNumber;
+    private Socket clientSocket = null;
     BufferedReader bufferedReader = null;
 
-    public socketConnection(Socket socket){
+    socketConnection(Socket socket){
         //7789
         this.clientSocket = socket;
         this.portNumber = socket.getPort();

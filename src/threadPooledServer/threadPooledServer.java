@@ -21,7 +21,7 @@ public class threadPooledServer implements Runnable{
             Executors.newFixedThreadPool(10);
     protected  connectionManager connectionManager = new connectionManager();
 
-    public threadPooledServer(int port){
+    threadPooledServer(int port){
         this.serverPort = port;
     }
 

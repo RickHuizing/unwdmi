@@ -7,16 +7,16 @@ import java.util.concurrent.*;
  * Created by Lenovo T420 on 17-1-2018.
  * holds all open connections, schedules receiving and writing of data
  */
-public class connectionManager {
-    Set connections = Collections.synchronizedSet(new HashSet());
+class connectionManager {
+    private final Set connections = Collections.synchronizedSet(new HashSet());
     ExecutorService socketExecutor =
             Executors.newFixedThreadPool(800);
-    ScheduledExecutorService scheduledExecutor =
+    private ScheduledExecutorService scheduledExecutor =
             Executors.newScheduledThreadPool(4);
 
-    public connectionManager(){}
+    connectionManager(){}
 
-    public void addConnection(socketConnection connection){
+    void addConnection(socketConnection connection){
         synchronized (connections) {
             connections.add(connection);
         }

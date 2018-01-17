@@ -6,10 +6,10 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 
 public class receiver implements Runnable{
-    int portNumber;
-    Socket clientSocket = null;
-    BufferedReader bufferedReader = null;
-    ExecutorService threadPool = null;
+    private int portNumber;
+    private Socket clientSocket = null;
+    private BufferedReader bufferedReader = null;
+    private ExecutorService threadPool = null;
 
     public receiver(Socket socket, ExecutorService tp){
         //7789

@@ -10,14 +10,14 @@ import java.util.*;
  * Created by Lenovo T420 on 17-1-2018.
  * writes a file for a socket
  */
-public class fileWriter {
-    List<String> messages = new ArrayList<>();
-    Random random = new Random();
+class fileWriter {
+    private List<String> messages = new ArrayList<>();
+    private Random random = new Random();
     int id = random.nextInt(1000000);
     //BufferedWriter bufferedWriter = new BufferedWriter;
-    public fileWriter(){
+    fileWriter(){
     }
-    public void addMessage(String message) {
+    void addMessage(String message) {
         synchronized (messages) {
             messages.add(message);
             if (message.contains("</WEATHERDATA>")) {
@@ -27,7 +27,7 @@ public class fileWriter {
             }
         }
     }
-    public void writefile() {
+    private void writefile() {
         synchronized (messages) {
             BufferedWriter bw = null;
             try {
@@ -42,9 +42,8 @@ public class fileWriter {
 
                 FileWriter fw = new FileWriter(txt);
                 bw = new BufferedWriter(fw);
-                Iterator<String> it = messages.iterator();
-                while (it.hasNext()) {
-                    bw.write(it.next());
+                for (String message : messages) {
+                    bw.write(message);
                     bw.newLine();
                 }
                 //System.out.println("File written Successfully");
