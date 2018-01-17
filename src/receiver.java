@@ -27,7 +27,7 @@ public class receiver {
                     System.out.println(x);
                     x++;
                 }
-                //System.out.println(inputLine);
+                System.out.println(inputLine);
             }
         } catch (IOException e) {
             System.out.println("Exception caught when trying to listen on port "
