@@ -11,43 +11,43 @@ import java.util.*;
  * writes a file for a socket
  */
 class fileWriter {
-    private List<String> messages = new ArrayList<>();
+    private List<Message> messages = new ArrayList<>();
     private Random random = new Random();
-    int id = random.nextInt(1000000);
-    //BufferedWriter bufferedWriter = new BufferedWriter;
+    private int id = 0;
     fileWriter(){
     }
-    void addMessage(String message) {
+    void addMessage(Message message) {
         synchronized (messages) {
             messages.add(message);
-            if (message.contains("</WEATHERDATA>")) {
+            //System.out.println("added mssg");
+            if (id == 0) {
+                id = message.getActiveStation();
+            }
+            if (messages.size() >= 100) {
                 Runnable task = this::writefile;
                 Thread thread = new Thread(task);
                 thread.start();
             }
         }
     }
+
     private void writefile() {
         synchronized (messages) {
             BufferedWriter bw = null;
             try {
-                String mycontent = "This String would be written" +
-                        " to the specified File";
-                //Specify the file name and path here
-                File txt = new File("C:/temp/myfile"+id+".txt");
+                //Specify the file name and path
+                File txt = new File("C:/temp/"+this.id+".txt");
 
                 if (!txt.exists()) {
                     txt.createNewFile();
                 }
 
-                FileWriter fw = new FileWriter(txt);
+                FileWriter fw = new FileWriter(txt, true);
                 bw = new BufferedWriter(fw);
-                for (String message : messages) {
-                    bw.write(message);
+                for (Message message : messages) {
+                    bw.write(message.getMessage());
                     bw.newLine();
                 }
-                //System.out.println("File written Successfully");
-
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             } finally {

@@ -12,7 +12,7 @@ class connectionManager {
     ExecutorService socketExecutor =
             Executors.newFixedThreadPool(800);
     private ScheduledExecutorService scheduledExecutor =
-            Executors.newScheduledThreadPool(4);
+            Executors.newScheduledThreadPool(10);
 
     connectionManager(){}
 
@@ -21,6 +21,6 @@ class connectionManager {
             connections.add(connection);
         }
         inputReader reader = new inputReader(connection.bufferedReader);
-        scheduledExecutor.scheduleAtFixedRate(reader, 10, 1750, TimeUnit.MILLISECONDS);
+        scheduledExecutor.scheduleAtFixedRate(reader, 10, 5, TimeUnit.MILLISECONDS);
     }
 }

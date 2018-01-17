@@ -5,6 +5,8 @@ import java.net.Socket;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * manages server socket
@@ -13,12 +15,14 @@ import java.util.concurrent.Executors;
  */
 public class threadPooledServer implements Runnable{
 
-    protected int          serverPort   = 7789;
-    protected ServerSocket serverSocket = null;
+    private int          serverPort   = 7789;
+    private ServerSocket serverSocket = null;
     protected boolean      isStopped    = false;
     protected Thread       runningThread= null;
     protected ExecutorService executorService =
             Executors.newFixedThreadPool(10);
+    private ScheduledExecutorService scheduledExecutor =
+            Executors.newScheduledThreadPool(1);
     protected  connectionManager connectionManager = new connectionManager();
 
     threadPooledServer(int port){
@@ -30,34 +34,15 @@ public class threadPooledServer implements Runnable{
             this.runningThread = Thread.currentThread();
         }
         openServerSocket();
-        initConnection();
-
-        while(! isStopped()){
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            //connectionManager.fetchData();
-            /*this.socketExecutor.execute(
-                    new receiver(clientSocket, socketExecutor));
-            System.out.println(this.socketExecutor.toString());*/
-        }
-        this.executorService.shutdown();
-        System.out.println("Server Stopped.") ;
+        Runnable task =()->{initialiseConnection();};
+        scheduledExecutor.scheduleAtFixedRate(task, 1,1, TimeUnit.MILLISECONDS);
     }
 
-    private void initConnection(){
-        Runnable task = this::initialiseConnection;
-        Thread thread = new Thread(task);
-        thread.start();
-    }
     private void initialiseConnection() {
         Socket clientSocket = null;
         clientSocket = acceptConnection();
         socketConnection connection = new socketConnection(clientSocket);
         this.connectionManager.addConnection(connection);
-        initConnection();
     }
 
     private Socket acceptConnection(){
@@ -69,19 +54,6 @@ public class threadPooledServer implements Runnable{
                     "Error accepting client connection", e);
         }
         return clientSocket;
-    }
-
-    private synchronized boolean isStopped() {
-        return this.isStopped;
-    }
-
-    public synchronized void stop(){
-        this.isStopped = true;
-        try {
-            this.serverSocket.close();
-        } catch (IOException e) {
-            throw new RuntimeException("Error closing server", e);
-        }
     }
 
     private void openServerSocket() {
