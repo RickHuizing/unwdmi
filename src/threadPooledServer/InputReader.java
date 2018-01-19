@@ -1,24 +1,28 @@
 package threadPooledServer;
 
 import java.io.BufferedReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Lenovo T420 on 17-1-2018.
  */
-public class inputReader implements Runnable {
+public class InputReader implements Runnable {
+    private ConnectionManager connectionManager;
     private BufferedReader bufferedReader = null;
-    private fileWriter fileWriter = new fileWriter();
-    private ArrayList<String> stations = new ArrayList<>(10);
-    private String stringBuffer;
-    private Message message;
-    int lineCounter =-1;
-    int messageCounter = 0;
+    private FileCreator fileCreator;
+    private Map<Integer, MessageContainer> messages = new HashMap<>();
 
-    inputReader(BufferedReader bufferedReader){
+    private int activeStation;
+    private String stringBuffer;
+    private int lineCounter =-1;
+    private int messageCounter = 0;
+
+    InputReader(BufferedReader bufferedReader, ConnectionManager connectionManager){
+        this.connectionManager = connectionManager;
         this.bufferedReader = bufferedReader;
+        fileCreator = new FileCreator(connectionManager);
     }
 
     public void run(){
@@ -27,7 +31,6 @@ public class inputReader implements Runnable {
             if ((inputLine = bufferedReader.readLine()) != null) {
                 //System.out.println(inputLine);
                 if(inputLine.contains("<MEASUREMENT>")){
-                    this.message=new Message();
                     stringBuffer="";
                     lineCounter =0;
                 }
@@ -36,12 +39,14 @@ public class inputReader implements Runnable {
                 }
 
                 if(inputLine.contains("</MEASUREMENT>")){
-                    //System.out.println("found eo msrmnt");
-                    fileWriter.addMessage(this.message);
                     stringBuffer="";
                     messageCounter++;
                     lineCounter = 15;
-                    if(messageCounter>100){fileWriter = new fileWriter();messageCounter=0;}
+                    if(messageCounter>450){
+                        fileCreator.addMessageMap(this.messages);
+                        fileCreator = new FileCreator(connectionManager);
+                        messages = new HashMap<>();
+                        messageCounter=0;}
                 }
                 lineCounter++;
             }
@@ -53,29 +58,41 @@ public class inputReader implements Runnable {
     }
 
     private void substringInputline(String inputLine, int x) {
+        boolean doWrite = true;
         switch(x) {
             case 0:
                 break;
             case 1:
                 inputLine = inputLine.trim().substring(5);
-                stringBuffer = inputLine.substring(0, inputLine.length() - 6);
-                this.message.setActiveStation(Integer.parseInt(stringBuffer));
+                int station =Integer.parseInt(inputLine.substring(0, inputLine.length() - 6));
+                this.activeStation = station;
+                if(!messages.containsKey(station)){
+                    MessageContainer messageContainer = new MessageContainer();
+                    messageContainer.setStation((this.activeStation));
+                    messages.put(station, messageContainer);
+                }else{
+                    messages.get(this.activeStation).setNewmssg(true);
+                }
+                doWrite = false;
                 break;
             case 2:
                 inputLine = inputLine.trim().substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
-                this.message.setMsgDate(stringBuffer);
+                this.messages.get(this.activeStation).setMsgDate(stringBuffer);
+                doWrite = false;
                 break;
             case 3:
                 inputLine = inputLine.trim().substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
-                this.message.setMsgTime(stringBuffer);
+                this.messages.get(this.activeStation).setMsgTime(stringBuffer);
+                doWrite = false;
                 break;
             case 4:
                 inputLine = inputLine.trim().substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
                 break;
             case 5:
+                this.messages.get(this.activeStation).setNewmssg(false);
                 inputLine = inputLine.trim().substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
                 break;
@@ -116,7 +133,10 @@ public class inputReader implements Runnable {
                 stringBuffer = inputLine.substring(0, inputLine.length() - 9);
                 break;
         }
-        this.message.message+=stringBuffer+" ";
+        if(doWrite) {
+            this.messages.get(this.activeStation).addMessage(stringBuffer+" ");
+            //this.message.message += stringBuffer + " ";
+        }
         stringBuffer="";
     }
 }

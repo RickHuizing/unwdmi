@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * accepts incoming connections
  * initializes the connection manager
  */
-public class threadPooledServer implements Runnable{
+public class ThreadPooledServer implements Runnable{
 
     private int          serverPort   = 7789;
     private ServerSocket serverSocket = null;
@@ -23,9 +23,9 @@ public class threadPooledServer implements Runnable{
             Executors.newFixedThreadPool(10);
     private ScheduledExecutorService scheduledExecutor =
             Executors.newScheduledThreadPool(1);
-    protected  connectionManager connectionManager = new connectionManager();
+    protected ConnectionManager connectionManager = new ConnectionManager();
 
-    threadPooledServer(int port){
+    ThreadPooledServer(int port){
         this.serverPort = port;
     }
 
@@ -34,15 +34,18 @@ public class threadPooledServer implements Runnable{
             this.runningThread = Thread.currentThread();
         }
         openServerSocket();
-        Runnable task =()->{initialiseConnection();};
+        Runnable task = this::initialiseConnection;
         scheduledExecutor.scheduleAtFixedRate(task, 1,1, TimeUnit.MILLISECONDS);
     }
 
     private void initialiseConnection() {
+        //long startTime = System.nanoTime();
         Socket clientSocket = null;
         clientSocket = acceptConnection();
-        socketConnection connection = new socketConnection(clientSocket);
+        SocketConnection connection = new SocketConnection(clientSocket);
         this.connectionManager.addConnection(connection);
+        //long estimatedTime = System.nanoTime() - startTime;
+        //System.out.println(estimatedTime);
     }
 
     private Socket acceptConnection(){

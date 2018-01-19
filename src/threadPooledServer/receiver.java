@@ -42,7 +42,7 @@ public class receiver implements Runnable{
                     if(x%10==0) {
                         String path = "c://temp//testFile" + x + "" + portNumber + ".txt";
                        // this.threadPool.execute(
-                         //       new fileWriter(path, message));
+                         //       new FileCreator(path, message));
                         message = "";
                     }
                     x++;
