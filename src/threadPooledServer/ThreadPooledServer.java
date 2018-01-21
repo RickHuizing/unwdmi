@@ -1,11 +1,11 @@
 package threadPooledServer;
 
+import resources.Constants;
+import resources.ExecutorServices;
+
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -15,19 +15,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class ThreadPooledServer implements Runnable{
 
-    private int          serverPort   = 7789;
+    private int          serverPort   = Constants.ServerSettings.SERVER_PORT;
     private ServerSocket serverSocket = null;
     protected boolean      isStopped    = false;
     protected Thread       runningThread= null;
-    protected ExecutorService executorService =
-            Executors.newFixedThreadPool(10);
-    private ScheduledExecutorService scheduledExecutor =
-            Executors.newScheduledThreadPool(1);
+
     protected ConnectionManager connectionManager = new ConnectionManager();
 
-    ThreadPooledServer(int port){
-        this.serverPort = port;
-    }
+    ThreadPooledServer( ){}
 
     public void run(){
         synchronized(this){
@@ -35,7 +30,7 @@ public class ThreadPooledServer implements Runnable{
         }
         openServerSocket();
         Runnable task = this::initialiseConnection;
-        scheduledExecutor.scheduleAtFixedRate(task, 1,1, TimeUnit.MILLISECONDS);
+        ExecutorServices.MAIN_EXECUTOR.scheduleAtFixedRate(task, 1,1, TimeUnit.MILLISECONDS);
     }
 
     private void initialiseConnection() {

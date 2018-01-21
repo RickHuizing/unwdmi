@@ -7,7 +7,7 @@ package threadPooledServer;
 public class ThreadPooledServerRunner {
 
     public static void main(String[] args) throws Exception {
-        ThreadPooledServer server = new ThreadPooledServer(7789);
+        ThreadPooledServer server = new ThreadPooledServer();
         new Thread(server).start();
     }
 }

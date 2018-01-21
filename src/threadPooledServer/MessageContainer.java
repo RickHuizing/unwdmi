@@ -1,5 +1,7 @@
 package threadPooledServer;
 
+import java.sql.Date;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,9 +47,13 @@ class MessageContainer {
     void setMsgDate(String msgDate) {
         this.msgDate = msgDate;
     }
+    String getMsgDate(){return this.msgDate;}
 
     void setMsgTime(String msgTime) {
         this.msgTime = msgTime;
+        //this.msgTime = this.msgTime.substring(0,5);
+        this.msgTime = msgTime.replaceAll(":", "-");
+        //System.out.println(Time.valueOf(this.msgTime));
     }
-
+    String getMsgTime(){return this.msgTime;}
 }

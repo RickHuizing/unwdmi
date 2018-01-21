@@ -1,5 +1,8 @@
 package threadPooledServer;
 
+import resources.Constants;
+import resources.ExecutorServices;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -9,7 +12,6 @@ import java.util.Map;
  * Created by Lenovo T420 on 17-1-2018.
  */
 public class InputReader implements Runnable {
-    private ConnectionManager connectionManager;
     private BufferedReader bufferedReader = null;
     private FileCreator fileCreator;
     private Map<Integer, MessageContainer> messages = new HashMap<>();
@@ -18,11 +20,15 @@ public class InputReader implements Runnable {
     private String stringBuffer;
     private int lineCounter =-1;
     private int messageCounter = 0;
+    private Boolean newFile = true;
+
+    private int day;
+    private int minute;
+    private int hour;
 
     InputReader(BufferedReader bufferedReader, ConnectionManager connectionManager){
-        this.connectionManager = connectionManager;
         this.bufferedReader = bufferedReader;
-        fileCreator = new FileCreator(connectionManager);
+        fileCreator = new FileCreator();
     }
 
     public void run(){
@@ -42,9 +48,12 @@ public class InputReader implements Runnable {
                     stringBuffer="";
                     messageCounter++;
                     lineCounter = 15;
-                    if(messageCounter>450){
-                        fileCreator.addMessageMap(this.messages);
-                        fileCreator = new FileCreator(connectionManager);
+                    if(messageCounter> Constants.FileSettings.MESSAGE_SIZE/Constants.FileSettings.CLUSTER_SIZE){
+                        fileCreator.writeMessageMap(this.messages);
+                        if(this.newFile){
+                            Runnable task = this::newFile;
+                            ExecutorServices.WRITER_EXECUTOR.execute(task);
+                            this.newFile=false;}
                         messages = new HashMap<>();
                         messageCounter=0;}
                 }
@@ -57,6 +66,9 @@ public class InputReader implements Runnable {
         }
     }
 
+    private void newFile(){
+        fileCreator.writerListInit();
+    }
     private void substringInputline(String inputLine, int x) {
         boolean doWrite = true;
         switch(x) {
@@ -79,12 +91,15 @@ public class InputReader implements Runnable {
                 inputLine = inputLine.trim().substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
                 this.messages.get(this.activeStation).setMsgDate(stringBuffer);
+                checkDate(stringBuffer);
                 doWrite = false;
                 break;
             case 3:
                 inputLine = inputLine.trim().substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
                 this.messages.get(this.activeStation).setMsgTime(stringBuffer);
+                stringBuffer = stringBuffer.substring(0,5);
+                checkTime(stringBuffer);
                 doWrite = false;
                 break;
             case 4:
@@ -134,9 +149,24 @@ public class InputReader implements Runnable {
                 break;
         }
         if(doWrite) {
+            if(stringBuffer.isEmpty()){stringBuffer="0.00";}
             this.messages.get(this.activeStation).addMessage(stringBuffer+" ");
-            //this.message.message += stringBuffer + " ";
         }
         stringBuffer="";
+    }
+    void checkDate(String date){
+
+        int day = Integer.parseInt(date.substring(5,7));
+        if(this.day!=day){newFile=true;}
+        this.day=day;
+    }
+    void checkTime(String time){
+        int minute = Integer.parseInt(time.substring(3,5));
+        int hour = Integer.parseInt(time.substring(0,2));
+        if(minute-this.minute>Constants.FileSettings.FILE_INTERVAL -1 || hour!=this.hour){
+            this.newFile = true;
+        }
+        this.minute = minute;
+        this.hour = hour;
     }
 }

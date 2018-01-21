@@ -1,6 +1,8 @@
 package threadPooledServer;
 
-import java.io.BufferedWriter;
+import resources.Constants;
+import resources.ExecutorServices;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -11,56 +13,88 @@ import java.util.*;
  */
 class FileCreator {
     private Map<Integer, MessageContainer> messageMap = new HashMap<>();
-    private ConnectionManager connectionManager;
+    private Map<Integer, BufferedMessageWriter> writerList = new HashMap<>();
+    private Boolean writerListInit = false;
 
-    FileCreator(ConnectionManager connectionManager) {
-        this.connectionManager = connectionManager;
-    }
+    FileCreator() {}
 
-    void addMessageMap(Map<Integer, MessageContainer> messageMap){
+    void writeMessageMap(Map<Integer, MessageContainer> messageMap) {
         this.messageMap = messageMap;
-        Runnable task = this::writefile;
-        connectionManager.getExecutor().execute(task);
-        /*Thread thread = new Thread(task);
-        thread.start();*/
+        Runnable task = this::writeFiles;
+        ExecutorServices.WRITER_EXECUTOR.execute(task);
     }
 
-    //TODO get the writeline outa here initialising buffered writer takes 100 times longer than writing 60 lines(30 mssgs)
-    private void writefile() {
-        synchronized (messageMap) {
-            messageMap.forEach((id, messageContainer)->{
-                //long startTime = System.nanoTime();
-                BufferedWriter bw = null;
+
+    private void writeFiles() {
+        synchronized (this) {
+            if (!writerListInit) {
+                writerListInit();
+            }
+            messageMap.forEach((id, messageContainer) -> {
                 try {
-                    //Specify the file name and path
-                    File txt = new File("C:/temp/bla/" + id + ".txt");
-
-                    if (!txt.exists()) {
-                        txt.createNewFile();
-                    }
-
-                    java.io.FileWriter fw = new java.io.FileWriter(txt, true);
-                    bw = new BufferedWriter(fw);
-                    long startTime2=System.nanoTime();
-                    for(String mssg : messageContainer.getMessages()) {
+                    BufferedMessageWriter bw = writerList.get(id);
+                    for (String mssg : messageContainer.getMessages()) {
                         bw.write(mssg);
                         bw.newLine();
                     }
-                    //long estimatedTime2 = System.nanoTime() - startTime2;
-                    //System.out.println("took "+estimatedTime2+" to write lines");
+                    bw.flush();
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
-                } finally {
-                    try {
-                        if (bw != null)
-                            bw.close();
-                    } catch (Exception ex) {
-                        System.out.println("Error in closing the BufferedWriter" + ex);
-                    }
                 }
-                //long estimatedTime = System.nanoTime() - startTime;
-                //System.out.println("took "+estimatedTime+ " to write 1 file");
             });
         }
+    }
+    //creates a new file and initialises new BufferedMessageWriters for that file
+    void writerListInit() {
+        synchronized (this) {
+            if (writerListInit) {
+                killFileWriters();
+            }
+            writerList.clear();
+            messageMap.forEach((id, messageContainer) -> {
+                //long startTime = System.nanoTime();
+                BufferedMessageWriter bw;
+                try {
+                    //Specify the file name and path
+                    File txt = createFileFromMessage(messageContainer);
+
+                    java.io.FileWriter fw = new java.io.FileWriter(txt, true);
+                    bw = new BufferedMessageWriter(fw, id);
+                    writerList.put(id, bw);
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+            });
+            writerListInit = true;
+        }
+    }
+    void killFileWriters() {
+        writerList.forEach((id, bw)->{
+            try {
+                if (bw != null)
+                    bw.close();
+            } catch (Exception ex) {
+                System.out.println("Error in closing the BufferedWriter" + ex);
+            }
+         });
+    }
+    File createFileFromMessage(MessageContainer messageContainer){
+        int id = messageContainer.getStation();
+        String path = Constants.FileSettings.PATH + id;
+        File directory = new File(path);
+        directory.mkdir();
+        path = path +"/" + messageContainer.getMsgDate();
+        directory = new File(path);
+        directory.mkdir();
+        String fileName = "/" + messageContainer.getMsgTime() + ".txt";
+        File txt = new File(path + fileName);
+        try {
+            if (!txt.exists()) {
+                txt.createNewFile();
+            }
+        }catch(IOException e){
+            System.out.println(e.getMessage()+ "hoi");
+        }
+        return txt;
     }
 }
