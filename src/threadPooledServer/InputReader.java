@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-
     /**
      * Created by Lenovo T420 on 17-1-2018.
      */
@@ -41,7 +40,6 @@ public class InputReader implements Runnable {
                 if (lineCounter > 0 && lineCounter < 15) {
                     substringInputLine(inputLine, lineCounter);
                 }
-
                 if (inputLine.contains("</MEASUREMENT>")) {
                     stringBuffer = "";
                     lineCounter = 15;
@@ -100,54 +98,65 @@ public class InputReader implements Runnable {
             case 4:
                 inputLine = inputLine.trim().substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
+                while(stringBuffer.length()<5){stringBuffer+=" ";}
                 break;
             case 5:
                 this.messages.get(this.activeStation).setNewmssg(false);
                 inputLine = inputLine.trim().substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
+                while(stringBuffer.length()<5){stringBuffer+=" ";}
                 break;
             case 6:
                 inputLine = inputLine.trim().substring(5);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 6);
+                while(stringBuffer.length()<6){stringBuffer+=" ";}
                 break;
             case 7:
                 inputLine = inputLine.trim().substring(5);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 6);
+                while(stringBuffer.length()<6){stringBuffer+=" ";}
                 break;
             case 8:
                 inputLine = inputLine.trim().substring(7);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 8);
+                while(stringBuffer.length()<5){stringBuffer+=" ";}
                 break;
             case 9:
                 inputLine = inputLine.trim().substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
+                while(stringBuffer.length()<5){stringBuffer+=" ";}
                 break;
             case 10:
                 inputLine = inputLine.trim().substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
+                while(stringBuffer.length()<5){stringBuffer+=" ";}
                 break;
             case 11:
                 inputLine = inputLine.trim().substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
+                while(stringBuffer.length()<5){stringBuffer+=" ";}
                 break;
             case 12:
                 inputLine = inputLine.trim().substring(8);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 9);
+                while(stringBuffer.length()<6){stringBuffer+=" ";}
                 break;
             case 13:
                 inputLine = inputLine.trim().substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
+                while(stringBuffer.length()<4){stringBuffer+=" ";}
                 break;
             case 14:
                 inputLine = inputLine.trim().substring(8);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 9);
+                while(stringBuffer.length()<3){stringBuffer+=" ";}
                 break;
         }
         if (doWrite) {
             if (stringBuffer.isEmpty()) {
                 stringBuffer = "0.00";
             }
-            this.messages.get(this.activeStation).addMessage(stringBuffer + " ");
+            this.messages.get(this.activeStation).addMessage(stringBuffer);
         }
         stringBuffer = "";
     }

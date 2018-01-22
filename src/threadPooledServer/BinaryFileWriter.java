@@ -30,11 +30,12 @@ public class BinaryFileWriter implements Runnable{
         Path fileP = Paths.get(filePath);
 
         try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(fileP))) {
-
+            String aantBericht = messages.toString();
+            while(aantBericht.length()<3){aantBericht+=" ";}
+            outputStream.write(aantBericht.getBytes());
             for (String line : content) {
                 outputStream.write(line.getBytes());
             }
-            outputStream.write(messages.toString().getBytes());
             outputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
