@@ -2,6 +2,8 @@ package threadPooledServer;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,10 +13,12 @@ import java.util.List;
  * Created by Lenovo T420 on 19-1-2018.
  */
 public class BinaryFileWriter implements Runnable{
+    private final Integer messages;
     private List<String> content;
     private String filePath;
 
-    BinaryFileWriter(List<String> content, String filePath) {
+    BinaryFileWriter(List<String> content, String filePath, int messages) {
+        this.messages = messages;
         this.content = content;
         this.filePath = filePath;
     }
@@ -30,9 +34,11 @@ public class BinaryFileWriter implements Runnable{
             for (String line : content) {
                 outputStream.write(line.getBytes());
             }
-
+            outputStream.write(messages.toString().getBytes());
+            outputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
         }
     }
 }
