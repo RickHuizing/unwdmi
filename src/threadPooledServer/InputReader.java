@@ -154,14 +154,14 @@ public class InputReader implements Runnable {
         }
         stringBuffer="";
     }
-    private void checkDate(String date){
 
+    private void checkDate(String date){
         int day = Integer.parseInt(date.substring(5,7));
         if(this.day!=day){
             newFile=true;
             this.day=day;}
-
     }
+
     private void checkTime(String time){
         int minute = Integer.parseInt(time.substring(3,5));
         int hour = Integer.parseInt(time.substring(0,2));
@@ -170,6 +170,5 @@ public class InputReader implements Runnable {
             this.minute = minute;
             this.hour = hour;
         }
-
     }
 }
