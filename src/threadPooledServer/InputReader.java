@@ -154,19 +154,22 @@ public class InputReader implements Runnable {
         }
         stringBuffer="";
     }
-    void checkDate(String date){
+    private void checkDate(String date){
 
         int day = Integer.parseInt(date.substring(5,7));
-        if(this.day!=day){newFile=true;}
-        this.day=day;
+        if(this.day!=day){
+            newFile=true;
+            this.day=day;}
+
     }
-    void checkTime(String time){
+    private void checkTime(String time){
         int minute = Integer.parseInt(time.substring(3,5));
         int hour = Integer.parseInt(time.substring(0,2));
         if(minute-this.minute>Constants.FileSettings.FILE_INTERVAL -1 || hour!=this.hour){
             this.newFile = true;
+            this.minute = minute;
+            this.hour = hour;
         }
-        this.minute = minute;
-        this.hour = hour;
+
     }
 }

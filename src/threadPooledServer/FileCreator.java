@@ -14,6 +14,7 @@ import java.util.*;
 class FileCreator {
     private Map<Integer, MessageContainer> messageMap = new HashMap<>();
     private Map<Integer, BufferedMessageWriter> writerList = new HashMap<>();
+
     private Boolean writerListInit = false;
 
     FileCreator() {}
@@ -96,5 +97,9 @@ class FileCreator {
             System.out.println(e.getMessage()+ "hoi");
         }
         return txt;
+    }
+
+    public void setWriterListInit(Boolean writerListInit) {
+        this.writerListInit = writerListInit;
     }
 }
