@@ -10,7 +10,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public final class ExecutorServices {
     private ExecutorServices(){}
     private static final int MAIN_EXECUTOR_THREAD_POOL_SIZE = 1;
-    private static final int WRITER_EXECUTOR_THREAD_POOL_SIZE = 10;
+    private static final int WRITER_EXECUTOR_THREAD_POOL_SIZE = 3;
     private static final int SOCKET_READER_EXECUTOR_THREAD_POOL_SIZE = 2;
 
     public static final ScheduledExecutorService MAIN_EXECUTOR =

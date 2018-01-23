@@ -34,13 +34,10 @@ public class ThreadPooledServer implements Runnable{
     }
 
     private void initialiseConnection() {
-        //long startTime = System.nanoTime();
         Socket clientSocket = null;
         clientSocket = acceptConnection();
         SocketConnection connection = new SocketConnection(clientSocket);
         this.connectionManager.addConnection(connection);
-        //long estimatedTime = System.nanoTime() - startTime;
-        //System.out.println(estimatedTime);
     }
 
     private Socket acceptConnection(){

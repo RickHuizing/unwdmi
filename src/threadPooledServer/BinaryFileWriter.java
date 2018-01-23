@@ -15,6 +15,7 @@ import java.util.List;
 public class BinaryFileWriter implements Runnable{
     private final Integer messages;
     private List<String> content;
+    private List<List<String>> contents;
     private String filePath;
 
     BinaryFileWriter(List<String> content, String filePath, int messages) {

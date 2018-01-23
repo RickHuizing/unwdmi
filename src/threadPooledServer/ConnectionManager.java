@@ -1,7 +1,6 @@
 package threadPooledServer;
 
 import resources.ExecutorServices;
-
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -20,6 +19,6 @@ class ConnectionManager {
         }
         InputReader reader = new InputReader(connection.bufferedReader);
         //800 sockets need to receive 165 lines/minute, receiving 1 line = ca 2500 nanoseconds = 330 milliseconds/second for receiving data
-        ExecutorServices.SOCKET_READER_EXECUTOR.scheduleAtFixedRate(reader, 10, 7, TimeUnit.MILLISECONDS);
+        ExecutorServices.SOCKET_READER_EXECUTOR.scheduleAtFixedRate(reader, 5, 7, TimeUnit.MILLISECONDS);
     }
 }

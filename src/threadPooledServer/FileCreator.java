@@ -4,32 +4,60 @@ import resources.Constants;
 import resources.ExecutorServices;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Lenovo T420 on 17-1-2018.
  * writes a file for a socket
  */
 class FileCreator {
+    static long runtime = 0;
+
     FileCreator(Map<Integer, MessageContainer> messageMap, int aantal) {
+        List messages = new ArrayList();
         messageMap.forEach((id, messageContainer) -> {
-            List messages = messageContainer.getMessages();
-            String path = createPathFromMessage(messageContainer);
-            BinaryFileWriter bfw = new BinaryFileWriter(messages, path, aantal);
-            ExecutorServices.WRITER_EXECUTOR.execute(bfw);
+            messages.addAll(messageContainer.getMessages());
         });
+        String path = createPathFromMessageMap(messageMap);
+        BinaryFileWriter bfw = new BinaryFileWriter(messages, path, aantal);
+        ExecutorServices.WRITER_EXECUTOR.execute(bfw);
     }
 
-    String createPathFromMessage(MessageContainer messageContainer){
+    String createPathFromMessageMap(Map<Integer, MessageContainer> messageMap){
+        //long startTime = System.nanoTime();
+        Object[] stations = messageMap.keySet().toArray();
+        MessageContainer messageContainer = messageMap.get(stations[0]);
         int id = messageContainer.getStation();
+
         String path = Constants.FileSettings.PATH + id;
+
         File directory = new File(path);
+        //if (!directory.exists())
         directory.mkdir();
         path +="/" + messageContainer.getMsgDate();
         directory = new File(path);
+        //if (!directory.exists())
         directory.mkdir();
         String fileName = "/" + messageContainer.getMsgTime() + ".txt";
+        //runtime += System.nanoTime()-startTime;
+        //System.out.println(runtime);
+        return path+fileName;
+    }
+    String createPathFromMessage(MessageContainer messageContainer){
+        //long startTime = System.nanoTime();
+        int id = messageContainer.getStation();
+        String path = Constants.FileSettings.PATH + id;
+        File directory = new File(path);
+        if (!directory.exists()) directory.mkdir();
+        path +="/" + messageContainer.getMsgDate();
+        directory = new File(path);
+        if (!directory.exists()) directory.mkdir();
+        String fileName = "/" + messageContainer.getMsgTime() + ".txt";
+        //runtime += System.nanoTime()-startTime;
+        //System.out.println(runtime);
         return path+fileName;
     }
 }
