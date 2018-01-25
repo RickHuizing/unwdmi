@@ -16,6 +16,7 @@ class MessageContainer {
 
     MessageContainer(){}
 
+    //list is overbodig
     void addMessage(String message){
         if(!newmssg){
             int size = messages.size()-1;

@@ -62,15 +62,6 @@ public class InputReader implements Runnable {
         }
     }
 
-    private void stop(){
-        this.scheduledFuture.cancel(false);
-        ExecutorServices.connections--;
-
-        if(!ThreadPooledServerRunner.isRunning) {
-            ThreadPooledServerRunner.isRunning=true;
-            new Thread(ThreadPooledServerRunner.server).start();
-        }
-    }
     private void handleMessage (String inputLine) {
         if (inputLine.contains("<MEASUREMENT>")) {
             stringBuffer = "";
@@ -203,6 +194,16 @@ public class InputReader implements Runnable {
             this.newFile = true;
             this.minute = minute;
             this.hour = hour;
+        }
+    }
+
+    private void stop(){
+        this.scheduledFuture.cancel(false);
+        ExecutorServices.connections--;
+
+        if(!ThreadPooledServerRunner.isRunning) {
+            ThreadPooledServerRunner.isRunning=true;
+            new Thread(ThreadPooledServerRunner.server).start();
         }
     }
 }
