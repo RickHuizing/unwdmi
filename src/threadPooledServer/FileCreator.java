@@ -14,11 +14,18 @@ import java.util.Set;
  * writes a file for a socket
  */
 class FileCreator {
+    StringBuilder clusterName = new StringBuilder();
     static long runtime = 0;
 
     FileCreator(Map<Integer, MessageContainer> messageMap, int aantal) {
         List messages = new ArrayList();
+        int x = 0;
+        messageMap.forEach((id, messageContainer)->{
+            messages.add(id.toString());
+            messages.add(" ");
+        });
         messageMap.forEach((id, messageContainer) -> {
+            clusterName.append(id);
             messages.addAll(messageContainer.getMessages());
         });
         String path = createPathFromMessageMap(messageMap);

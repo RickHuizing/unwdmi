@@ -48,8 +48,7 @@ class MessageContainer {
     String getMsgDate(){return this.msgDate;}
 
     void setMsgTime(String msgTime) {
-        this.msgTime = msgTime;
-        this.msgTime = msgTime.replaceAll(":", "-");
+        this.msgTime = msgTime.replace(":", "-");
     }
     String getMsgTime(){return this.msgTime;}
 }

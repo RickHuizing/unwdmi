@@ -1,11 +1,13 @@
 package threadPooledServer;
 
 import resources.Constants;
+import resources.ExecutorServices;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * Created by Lenovo T420 on 17-1-2018.
@@ -13,12 +15,21 @@ import java.util.Map;
 public class InputReader implements Runnable {
     private BufferedReader bufferedReader = null;
     private Map<Integer, MessageContainer> messages = new HashMap<>();
+    private ScheduledFuture<?> scheduledFuture = null;
 
+    private int stationCounter = 0;
     private int activeStation;
     private String stringBuffer;
     private int lineCounter = -1;
     private int messageCounter = 0;
     private Boolean newFile = false;
+
+    long start = 0;
+    long s1 = 0;
+    long s2 = 0;
+    long s3 = 0;
+    long s4 = 0;
+    long t;
 
     private int day = -1;
     private int minute = -1;
@@ -29,14 +40,20 @@ public class InputReader implements Runnable {
         this.bufferedReader = bufferedReader;
     }
 
+    public void setScheduledFuture(ScheduledFuture<?> scheduledFuture){this.scheduledFuture=scheduledFuture;}
+
     public void run() {
         try {
             String inputLine;
             if ((inputLine = bufferedReader.readLine()) != null) {
                 //System.out.println(inputLine);
                 handleMessage(inputLine);
+            }else{
+                System.out.println("lost connection");
+                stop();
             }
         } catch (IOException e) {
+            stop();
             System.out.println("Exception caught when trying to listen on port "
                     + "xxx" + " or listening for a connection");
             System.out.println(e.getMessage());
@@ -45,6 +62,15 @@ public class InputReader implements Runnable {
         }
     }
 
+    private void stop(){
+        this.scheduledFuture.cancel(false);
+        ExecutorServices.connections--;
+
+        if(!ThreadPooledServerRunner.isRunning) {
+            ThreadPooledServerRunner.isRunning=true;
+            new Thread(ThreadPooledServerRunner.server).start();
+        }
+    }
     private void handleMessage (String inputLine) {
         if (inputLine.contains("<MEASUREMENT>")) {
             stringBuffer = "";
@@ -68,22 +94,26 @@ public class InputReader implements Runnable {
     private void newFile(){
         new FileCreator(this.messages, messageCounter);
         messages = new HashMap<>();
+        stationCounter = 0;
         this.newFile = false;
         messageCounter = 0;
     }
     private void substringInputLine(String inputLine, int x) {
+        inputLine = inputLine.trim();
         boolean doWrite = true;
         switch(x) {
             case 0:
                 break;
             case 1:
-                int station = Integer.parseInt(inputLine.trim().substring(5, inputLine.length() - 8));
+                int station;
+                station = Integer.parseInt(inputLine.substring(5, inputLine.length() - 6));
                 this.activeStation = station;
-                if (!messages.containsKey(station)) {
+                if (stationCounter!=10) {
                     MessageContainer messageContainer = new MessageContainer();
                     messageContainer.setStation((this.activeStation));
                     messages.put(station, messageContainer);
                     this.activeStationObj = messageContainer;
+                    stationCounter++;
                 } else {
                     this.activeStationObj = messages.get(this.activeStation);
                     activeStationObj.setNewmssg(true);
@@ -91,14 +121,14 @@ public class InputReader implements Runnable {
                 doWrite = false;
                 break;
             case 2:
-                inputLine = inputLine.trim().substring(6);
+                inputLine = inputLine.substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
                 activeStationObj.setMsgDate(stringBuffer);
                 checkDate(stringBuffer);
                 doWrite = false;
                 break;
             case 3:
-                inputLine = inputLine.trim().substring(6);
+                inputLine = inputLine.substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
                 activeStationObj.setMsgTime(stringBuffer);
                 stringBuffer = stringBuffer.substring(0, 5);
@@ -106,43 +136,43 @@ public class InputReader implements Runnable {
                 doWrite = false;
                 break;
             case 4:
-                inputLine = inputLine.trim().substring(6);
+                inputLine = inputLine.substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
-                while(stringBuffer.length()<5){stringBuffer+=" ";}
+                while(stringBuffer.length()<5)stringBuffer+=" ";
                 break;
             case 5:
                 activeStationObj.setNewmssg(false);
-                inputLine = inputLine.trim().substring(6);
+                inputLine = inputLine.substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
                 while(stringBuffer.length()<5){stringBuffer+=" ";}
                 break;
             case 6: case 7:
-                inputLine = inputLine.trim().substring(5);
+                inputLine = inputLine.substring(5);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 6);
                 while(stringBuffer.length()<6){stringBuffer+=" ";}
                 break;
             case 8:
-                inputLine = inputLine.trim().substring(7);
+                inputLine = inputLine.substring(7);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 8);
                 while(stringBuffer.length()<5){stringBuffer+=" ";}
                 break;
             case 9:case 10:case 11:
-                inputLine = inputLine.trim().substring(6);
+                inputLine = inputLine.substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
                 while(stringBuffer.length()<5){stringBuffer+=" ";}
                 break;
             case 12:
-                inputLine = inputLine.trim().substring(8);
+                inputLine = inputLine.substring(8);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 9);
                 while(stringBuffer.length()<6){stringBuffer+=" ";}
                 break;
             case 13:
-                inputLine = inputLine.trim().substring(6);
+                inputLine = inputLine.substring(6);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 7);
                 while(stringBuffer.length()<4){stringBuffer+=" ";}
                 break;
             case 14:
-                inputLine = inputLine.trim().substring(8);
+                inputLine = inputLine.substring(8);
                 stringBuffer = inputLine.substring(0, inputLine.length() - 9);
                 while(stringBuffer.length()<3){stringBuffer+=" ";}
                 break;

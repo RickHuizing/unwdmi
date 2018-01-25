@@ -6,6 +6,7 @@ import resources.ExecutorServices;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -22,15 +23,15 @@ public class ThreadPooledServer implements Runnable{
 
     protected ConnectionManager connectionManager = new ConnectionManager();
 
-    ThreadPooledServer( ){}
+    private ScheduledFuture<?> initConnectionTask = null;
+    ThreadPooledServer( ){openServerSocket();}
 
-    public void run(){
-        synchronized(this){
+    public void run() {
+        synchronized (this) {
             this.runningThread = Thread.currentThread();
         }
-        openServerSocket();
         Runnable task = this::initialiseConnection;
-        ExecutorServices.MAIN_EXECUTOR.scheduleAtFixedRate(task, 1,1, TimeUnit.MILLISECONDS);
+        initConnectionTask = ExecutorServices.MAIN_EXECUTOR.scheduleAtFixedRate(task, 1, 1, TimeUnit.MILLISECONDS);
     }
 
     private void initialiseConnection() {
@@ -38,6 +39,11 @@ public class ThreadPooledServer implements Runnable{
         clientSocket = acceptConnection();
         SocketConnection connection = new SocketConnection(clientSocket);
         this.connectionManager.addConnection(connection);
+        ExecutorServices.connections++;
+        if(ExecutorServices.connections==800){
+            initConnectionTask.cancel(true);
+            ThreadPooledServerRunner.isRunning=false;
+        }
     }
 
     private Socket acceptConnection(){

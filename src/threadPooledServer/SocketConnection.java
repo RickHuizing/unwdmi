@@ -18,8 +18,7 @@ class SocketConnection {
             this.bufferedReader = new BufferedReader(
                     new InputStreamReader(socket.getInputStream()));
         } catch (IOException e) {
-            System.out.println("Exception caught when trying to listen on port "
-                    + socket.getPort() + " or listening for a connection");
+            System.out.println("Exception caught when trying to load input stream ");
             System.out.println(e.getMessage());
         }
     }
