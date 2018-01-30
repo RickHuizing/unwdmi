@@ -12,7 +12,7 @@ import java.util.concurrent.ScheduledFuture;
 /**
  * Created by Lenovo T420 on 17-1-2018.
  */
-public class InputReader implements Runnable {
+public class InputReaderTest implements Runnable {
     private BufferedReader bufferedReader = null;
     private Map<Integer, MessageContainer> messages = new HashMap<>();
     private ScheduledFuture<?> scheduledFuture = null;
@@ -38,7 +38,7 @@ public class InputReader implements Runnable {
     private int hour = -1;
     private MessageContainer activeStationObj;
 
-    InputReader(BufferedReader bufferedReader) {
+    InputReaderTest(BufferedReader bufferedReader) {
         this.bufferedReader = bufferedReader;
     }
 
@@ -198,17 +198,18 @@ public class InputReader implements Runnable {
             this.hour = hour;
         }
     }
+    public boolean isStopped(){return stopped;}
 
     private void stop() {
         if (!stopped) {
             stopped = true;
-            this.scheduledFuture.cancel(false);
+            /*this.scheduledFuture.cancel(false);
             ExecutorServices.connections--;
 
             if (!ThreadPooledServerRunner.isRunning) {
                 ThreadPooledServerRunner.isRunning = true;
                 new Thread(ThreadPooledServerRunner.server).start();
-            }
+            }*/
         }
     }
 }

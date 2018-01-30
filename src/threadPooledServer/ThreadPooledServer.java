@@ -6,6 +6,7 @@ import resources.ExecutorServices;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -40,9 +41,10 @@ public class ThreadPooledServer implements Runnable{
         SocketConnection connection = new SocketConnection(clientSocket);
         this.connectionManager.addConnection(connection);
         ExecutorServices.connections++;
-        if(ExecutorServices.connections==800){
+        if (ExecutorServices.connections >= 800) {
             initConnectionTask.cancel(true);
-            ThreadPooledServerRunner.isRunning=false;
+            ExecutorServices.MAIN_EXECUTOR.shutdown();
+            ThreadPooledServerRunner.isRunning = false;
         }
     }
 
