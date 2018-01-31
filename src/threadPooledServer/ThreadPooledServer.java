@@ -1,12 +1,11 @@
 package threadPooledServer;
 
-import resources.Constants;
+import resources.Settings;
 import resources.ExecutorServices;
 
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -17,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ThreadPooledServer implements Runnable{
 
-    private int          serverPort   = Constants.ServerSettings.SERVER_PORT;
+    private int          serverPort   = Settings.ServerSettings.SERVER_PORT;
     private ServerSocket serverSocket = null;
     protected boolean      isStopped    = false;
     protected Thread       runningThread= null;

@@ -1,6 +1,6 @@
 package threadPooledServer;
 
-import resources.Constants;
+import resources.Settings;
 import resources.ExecutorServices;
 
 import java.io.BufferedReader;
@@ -192,7 +192,7 @@ public class InputReader implements Runnable {
         int minute = Integer.parseInt(time.substring(3, 5));
         int hour = Integer.parseInt(time.substring(0, 2));
         if(minute==-1){this.minute =minute; this.hour = hour;}
-        if (minute - this.minute > Constants.FileSettings.FILE_INTERVAL - 1 || hour != this.hour) {
+        if (minute - this.minute > Settings.FileSettings.FILE_INTERVAL - 1 || hour != this.hour) {
             this.newFile = true;
             this.minute = minute;
             this.hour = hour;

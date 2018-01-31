@@ -1,6 +1,6 @@
 package old;
 /*
-import resources.Constants;
+import resources.Settings;
 import resources.ExecutorServices;
 import threadPooledServer.MessageContainer;
 
@@ -83,7 +83,7 @@ class FileCreatorOld {
     }
     File createFileFromMessage(MessageContainer messageContainer){
         int id = messageContainer.getStation();
-        String path = Constants.FileSettings.PATH + id;
+        String path = Settings.FileSettings.PATH + id;
         File directory = new File(path);
         directory.mkdir();
         path = path +"/" + messageContainer.getMsgDate();

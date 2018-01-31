@@ -3,8 +3,8 @@ package resources;
 /**
  * Created by Lenovo T420 on 21-1-2018.
  */
-public final class Constants {
-    private  Constants(){}
+public final class Settings {
+    private Settings(){}
 
     public static final class ServerSettings{
         private ServerSettings(){}

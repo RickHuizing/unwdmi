@@ -1,8 +1,6 @@
 package threadPooledServer;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import resources.Constants;
-import resources.ExecutorServices;
+import resources.Settings;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -198,7 +196,7 @@ public class InputReaderTest implements Runnable {
         int minute = Integer.parseInt(time.substring(3, 5));
         int hour = Integer.parseInt(time.substring(0, 2));
         if(minute==-1){this.minute =minute; this.hour = hour;}
-        if (minute - this.minute > Constants.FileSettings.FILE_INTERVAL - 1 || hour != this.hour) {
+        if (minute - this.minute > Settings.FileSettings.FILE_INTERVAL - 1 || hour != this.hour) {
             this.newFile = true;
             this.minute = minute;
             this.hour = hour;
