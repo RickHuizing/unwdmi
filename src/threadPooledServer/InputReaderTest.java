@@ -1,5 +1,6 @@
 package threadPooledServer;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import resources.Constants;
 import resources.ExecutorServices;
 
@@ -24,6 +25,7 @@ public class InputReaderTest implements Runnable {
     private int messageCounter = 0;
     private Boolean newFile = false;
 
+    private Boolean receiving = false;
     private Boolean stopped = false;
 
     long start = 0;
@@ -45,22 +47,25 @@ public class InputReaderTest implements Runnable {
     public void setScheduledFuture(ScheduledFuture<?> scheduledFuture){this.scheduledFuture=scheduledFuture;}
 
     public void run() {
-        try {
-            String inputLine;
-            if ((inputLine = bufferedReader.readLine()) != null) {
-                //System.out.println(inputLine);
-                handleMessage(inputLine);
-            }else{
-                System.out.println("lost connection");
+        receiving = true;
+        while (receiving&&!stopped) {
+            try {
+                String inputLine;
+                if ((inputLine = bufferedReader.readLine()) != null) {
+                    //System.out.println(inputLine);
+                    handleMessage(inputLine);
+                } else {
+                    System.out.println("lost connection");
+                    stop();
+                }
+            } catch (IOException e) {
                 stop();
+                System.out.println("Exception caught when trying to listen on port "
+                        + "xxx" + " or listening for a connection");
+                System.out.println(e.getMessage());
+            } catch (Exception e) {
+                throw e;
             }
-        } catch (IOException e) {
-            stop();
-            System.out.println("Exception caught when trying to listen on port "
-                    + "xxx" + " or listening for a connection");
-            System.out.println(e.getMessage());
-        } catch (Exception e) {
-            throw e;
         }
     }
 
@@ -79,7 +84,8 @@ public class InputReaderTest implements Runnable {
         }
         if (inputLine.contains("</WEATHERDATA>")) {
             messageCounter++;
-            //if (this.newFile) newFile();
+            receiving = false;
+            if (this.newFile) newFile();
         }
         lineCounter++;
     }
@@ -200,9 +206,18 @@ public class InputReaderTest implements Runnable {
     }
     public boolean isStopped(){return stopped;}
 
+    public boolean checkBuffer(){
+        try {
+            return bufferedReader.ready();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
     private void stop() {
         if (!stopped) {
             stopped = true;
+            receiving = false;
             /*this.scheduledFuture.cancel(false);
             ExecutorServices.connections--;
 

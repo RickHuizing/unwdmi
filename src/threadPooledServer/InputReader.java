@@ -79,7 +79,7 @@ public class InputReader implements Runnable {
         }
         if (inputLine.contains("</WEATHERDATA>")) {
             messageCounter++;
-            //if (this.newFile) newFile();
+            if (this.newFile) newFile();
         }
         lineCounter++;
     }
