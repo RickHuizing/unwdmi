@@ -18,6 +18,7 @@ class FileCreator {
     FileCreator(Map<Integer, MessageContainer> messageMap, int aantal) {
         List messages = new ArrayList();
         /*
+
         messageMap.forEach((id, messageContainer)->{
             messages.add(id.toString());
             messages.add(" ");
